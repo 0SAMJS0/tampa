@@ -1,0 +1,347 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<title>Tampa De Masair</title>
+<meta name="description" content="Tampa De Masair — the greatest Insta page on the road to 1,000,000 followers.">
+<meta name="theme-color" content="#0b0c0d">
+<link href="https://fonts.googleapis.com/css2?family=Instrument+Serif:ital@0;1&family=Inter:wght@400;500;700;900&family=JetBrains+Mono:wght@400;600&display=swap" rel="stylesheet">
+<style>
+  :root{
+    --bg:#0b0c0d; --fg:#f2efe9; --muted:#8b8a86; --line:#232527;
+    --accent:#ff6a1a; --accent2:#ffd36a; --card:#121416;
+  }
+  *{box-sizing:border-box;margin:0;padding:0}
+  html{scroll-behavior:smooth}
+  body{background:var(--bg);color:var(--fg);font-family:Inter,system-ui,sans-serif;overflow-x:hidden;-webkit-font-smoothing:antialiased}
+  a{color:inherit}
+  .mono{font-family:"JetBrains Mono",monospace;font-size:12px;letter-spacing:.04em;color:var(--muted)}
+  .serif{font-family:"Instrument Serif",serif;font-weight:400}
+  em{font-family:"Instrument Serif",serif;font-style:italic;color:var(--accent)}
+
+  /* Loader */
+  #loader{position:fixed;inset:0;background:var(--bg);z-index:100;display:flex;align-items:flex-end;justify-content:space-between;padding:24px;transition:transform .8s cubic-bezier(.7,0,.2,1)}
+  #loader.done{transform:translateY(-100%)}
+  #loader .num{font-size:22vw;font-weight:900;line-height:.8;letter-spacing:-.05em}
+
+  /* Background canvas */
+  #dots{position:fixed;inset:0;z-index:0;pointer-events:none;opacity:.55}
+  main,nav,footer{position:relative;z-index:1}
+
+  /* Nav */
+  nav{position:sticky;top:0;display:flex;justify-content:space-between;align-items:center;padding:14px 16px;background:rgba(11,12,13,.75);backdrop-filter:blur(10px);border-bottom:1px solid var(--line);z-index:10}
+  nav .brand{font-weight:900;text-decoration:none;letter-spacing:-.02em}
+  nav ul{display:flex;gap:14px;list-style:none}
+  nav ul a{text-decoration:none;font-size:14px;color:var(--muted)}
+  nav ul a:hover{color:var(--fg)}
+  @media(max-width:640px){nav ul{display:none}}
+
+  section{padding:80px 16px;max-width:1100px;margin:0 auto}
+
+  /* Hero */
+  .hero{min-height:88vh;display:flex;flex-direction:column;justify-content:center}
+  .hero h1{font-size:clamp(56px,13vw,170px);font-weight:900;letter-spacing:-.05em;line-height:.88;margin:18px 0}
+  .hero h1 span{display:block}
+  .hero p.lead{font-size:clamp(18px,2.4vw,24px);max-width:640px;color:#cfccc5;line-height:1.45}
+  .stats{display:grid;grid-template-columns:repeat(auto-fit,minmax(150px,1fr));gap:1px;background:var(--line);border:1px solid var(--line);margin-top:40px}
+  .stats div{background:var(--bg);padding:16px}
+  .stats b{display:block;font-size:20px;margin-top:6px}
+
+  /* Counter */
+  .counter-wrap{border:1px solid var(--line);background:var(--card);padding:28px 20px;border-radius:18px}
+  .big{font-size:clamp(48px,12vw,140px);font-weight:900;letter-spacing:-.04em;font-variant-numeric:tabular-nums;line-height:1}
+  .bar{height:14px;background:#1d2023;border-radius:99px;overflow:hidden;margin:18px 0 8px}
+  .bar i{display:block;height:100%;width:0;background:linear-gradient(90deg,var(--accent),var(--accent2));transition:width .5s}
+  .btns{display:flex;flex-wrap:wrap;gap:10px;margin-top:22px}
+  button{font:600 15px Inter,sans-serif;border:1px solid var(--line);background:#181a1d;color:var(--fg);padding:12px 18px;border-radius:99px;cursor:pointer;transition:transform .15s,background .2s}
+  button:hover{background:#22262a}
+  button:active{transform:scale(.95)}
+  button.hot{background:var(--accent);border-color:var(--accent);color:#111}
+  #log{margin-top:16px;min-height:20px}
+
+  /* Section heads */
+  .head{display:flex;justify-content:space-between;align-items:baseline;border-bottom:1px solid var(--line);padding-bottom:12px;margin-bottom:36px}
+  .head h2{font-size:clamp(34px,6vw,64px);font-weight:900;letter-spacing:-.04em}
+
+  /* Photo */
+  .photo{border-radius:22px;overflow:hidden;border:1px solid var(--line);transform-style:preserve-3d;transition:transform .2s;background:var(--card)}
+  .photo img{width:100%;display:block}
+  .photo .fallback{padding:60px 20px;text-align:center;color:var(--muted)}
+  .caption{margin-top:12px}
+
+  /* Reasons */
+  .reason{display:grid;grid-template-columns:70px 1fr;gap:16px;padding:32px 0;border-bottom:1px solid var(--line)}
+  .reason h3{font-size:clamp(26px,4.5vw,46px);font-weight:700;letter-spacing:-.03em;line-height:1.05;margin:8px 0 12px}
+  .reason p{color:#bdbab3;line-height:1.6;max-width:640px}
+  .tags{display:flex;flex-wrap:wrap;gap:8px;margin-top:14px}
+  .tags span{border:1px solid var(--line);border-radius:99px;padding:5px 12px;font-size:12px;color:var(--muted)}
+  .reveal{opacity:0;transform:translateY(30px);transition:all .8s cubic-bezier(.2,.7,.2,1)}
+  .reveal.in{opacity:1;transform:none}
+
+  /* Roadmap accordion */
+  .step{border-bottom:1px solid var(--line)}
+  .step summary{list-style:none;cursor:pointer;display:flex;justify-content:space-between;align-items:center;padding:22px 0;font-size:clamp(22px,4vw,34px);font-weight:700;letter-spacing:-.02em}
+  .step summary::-webkit-details-marker{display:none}
+  .step summary::after{content:"+";font-weight:400;color:var(--accent);transition:transform .3s}
+  .step[open] summary::after{transform:rotate(45deg)}
+  .step .body{padding:0 0 24px;color:#bdbab3;line-height:1.6}
+  .step .tick{color:var(--accent);margin-right:10px;font-size:14px;font-family:"JetBrains Mono",monospace}
+
+  /* Marquee */
+  .marquee{overflow:hidden;border-block:1px solid var(--line);padding:18px 0;white-space:nowrap}
+  .marquee div{display:inline-block;animation:slide 22s linear infinite;font-size:clamp(28px,5vw,54px);font-weight:900;letter-spacing:-.03em}
+  .marquee em{margin:0 18px}
+  @keyframes slide{to{transform:translateX(-50%)}}
+
+  /* Quiz */
+  .quiz{position:relative;min-height:220px;border:1px dashed var(--line);border-radius:18px;padding:28px 20px;text-align:center}
+  .quiz h3{font-size:clamp(24px,4vw,36px);margin-bottom:24px}
+  #no{position:relative;transition:left .25s,top .25s}
+
+  /* Contact */
+  .contact h2{font-size:clamp(40px,9vw,110px);font-weight:900;letter-spacing:-.05em;line-height:.9;margin:16px 0 30px}
+  footer{display:flex;justify-content:space-between;flex-wrap:wrap;gap:10px;padding:24px 16px;border-top:1px solid var(--line)}
+  .toast{position:fixed;left:50%;bottom:24px;transform:translateX(-50%) translateY(120px);background:var(--fg);color:#111;padding:12px 20px;border-radius:99px;font-weight:600;z-index:50;transition:transform .35s}
+  .toast.show{transform:translateX(-50%) translateY(0)}
+  .confetti{position:fixed;top:-10px;width:9px;height:14px;z-index:60;pointer-events:none;animation:fall linear forwards}
+  @keyframes fall{to{transform:translateY(110vh) rotate(720deg)}}
+</style>
+</head>
+<body>
+
+<div id="loader"><span class="num" id="loadNum">000</span><span class="mono">Loading greatness…</span></div>
+<canvas id="dots"></canvas>
+
+<nav id="top">
+  <a href="#top" class="brand">Tampa De Masair®</a>
+  <ul>
+    <li><a href="#count">Counter,</a></li>
+    <li><a href="#squad">Squad,</a></li>
+    <li><a href="#why">Why us,</a></li>
+    <li><a href="#road">Roadmap</a></li>
+  </ul>
+  <span class="mono">Tampa <span id="clock">--:--</span></span>
+</nav>
+
+<main>
+  <section class="hero">
+    <span class="mono">[ Instagram page ] Road to 1,000,000 ✳</span>
+    <h1><span>Tampa</span><span>De <em>Masair</em></span></h1>
+    <p class="lead">The greatest Insta page ever assembled. Seven legends, one feed, and a very reasonable plan to hit <b>one million followers</b>.</p>
+    <div class="stats">
+      <div><span class="mono">Goal</span><b>1,000,000</b></div>
+      <div><span class="mono">Members</span><b>7 legends</b></div>
+      <div><span class="mono">Status</span><b>Inevitable</b></div>
+    </div>
+    <p class="mono" style="margin-top:28px">Scroll ↓ Each dot behind this page is a future follower. The orange ones already know.</p>
+  </section>
+
+  <section id="count">
+    <div class="head"><h2>The Counter</h2><span class="mono">(Live-ish)</span></div>
+    <div class="counter-wrap">
+      <span class="mono">Followers</span>
+      <div class="big" id="followers">0</div>
+      <div class="bar"><i id="barFill"></i></div>
+      <div style="display:flex;justify-content:space-between"><span class="mono" id="pct">0.000%</span><span class="mono">1,000,000</span></div>
+      <div class="btns">
+        <button data-add="137">📸 Post a pic</button>
+        <button data-add="1200">🎬 Drop a reel</button>
+        <button data-add="8500">🤝 Collab</button>
+        <button class="hot" data-add="75000">🔥 Go viral</button>
+        <button id="reset">↺ Reset</button>
+      </div>
+      <p class="mono" id="log">Tap a button to grow the page.</p>
+    </div>
+  </section>
+
+  <section id="squad">
+    <div class="head"><h2>The Squad</h2><span class="mono">(07)</span></div>
+    <div class="photo" id="photo">
+      <img src="IMG_2221.jpeg" alt="The Tampa De Masair squad" onerror="this.outerHTML='<div class=&quot;fallback&quot;>Upload your group photo to the repo as <b>IMG_2221.jpeg</b> and it shows up here.</div>'">
+    </div>
+    <p class="mono caption">Faces professionally edited for maximum aura. Tilt your phone or hover.</p>
+  </section>
+
+  <section id="why">
+    <div class="head"><h2>Why we're the greatest</h2><span class="mono">(03)</span></div>
+
+    <div class="reason reveal">
+      <span class="mono">01</span>
+      <div>
+        <span class="mono">Content · Unmatched</span>
+        <h3>Our content <em>doesn't miss</em>.</h3>
+        <p>Every post is a certified banger. Shalwar kameez fits, peak group photos, edits that should be illegal. The algorithm isn't ready, but it will be.</p>
+        <div class="tags"><span>Fits</span><span>Edits</span><span>Aura</span></div>
+      </div>
+    </div>
+
+    <div class="reason reveal">
+      <span class="mono">02</span>
+      <div>
+        <span class="mono">Squad · Elite</span>
+        <h3>Seven guys. <em>Zero</em> weak links.</h3>
+        <p>Most pages have one main character. We have seven. Every member brings a different flavor, and together it's a full menu.</p>
+        <div class="tags"><span>Chemistry</span><span>Loyalty</span><span>Chaos</span></div>
+      </div>
+    </div>
+
+    <div class="reason reveal">
+      <span class="mono">03</span>
+      <div>
+        <span class="mono">Strategy · Foolproof</span>
+        <h3>The plan is <em>simple</em>.</h3>
+        <p>Post consistently, collab with everyone, go viral at least once, and never stop. A million followers is not a dream. It's a schedule.</p>
+        <div class="tags"><span>Consistency</span><span>Reels</span><span>Collabs</span></div>
+      </div>
+    </div>
+  </section>
+
+  <div class="marquee"><div>
+    Tampa De Masair<em>✳</em>Road to 1M<em>✳</em>Greatest page<em>✳</em>No weak links<em>✳</em>
+    Tampa De Masair<em>✳</em>Road to 1M<em>✳</em>Greatest page<em>✳</em>No weak links<em>✳</em>
+  </div></div>
+
+  <section id="road">
+    <div class="head"><h2>Roadmap</h2><span class="mono">(05) · Tap to open</span></div>
+    <details class="step"><summary><span><span class="tick">01</span>1,000 followers</span></summary><div class="body">Friends, family, cousins, and that one uncle who likes every post. The foundation of an empire.</div></details>
+    <details class="step"><summary><span><span class="tick">02</span>10,000 followers</span></summary><div class="body">The swipe-up era. Strangers start recognizing the squad. Reels go weekly.</div></details>
+    <details class="step"><summary><span><span class="tick">03</span>100,000 followers</span></summary><div class="body">Collabs with bigger pages. First viral reel. Merch gets discussed and not yet made.</div></details>
+    <details class="step"><summary><span><span class="tick">04</span>500,000 followers</span></summary><div class="body">Brands in the DMs. Group photos now need a booking request.</div></details>
+    <details class="step"><summary><span><span class="tick">05</span>1,000,000 followers</span></summary><div class="body">Blue check. Celebration dinner. This website gets a new section titled "We told you so."</div></details>
+  </section>
+
+  <section>
+    <div class="quiz" id="quizBox">
+      <h3>Is Tampa De Masair the greatest Insta page?</h3>
+      <div class="btns" style="justify-content:center">
+        <button class="hot" id="yes">Obviously yes</button>
+        <button id="no">No</button>
+      </div>
+    </div>
+  </section>
+
+  <section class="contact">
+    <span class="mono">(Follow)</span>
+    <h2>Be follower <em>#1,000,000</em>.</h2>
+    <div class="btns">
+      <a href="https://instagram.com/tampademasair" target="_blank" rel="noopener"><button class="hot">Follow on Insta ↗</button></a>
+      <button id="copy">Copy @handle</button>
+    </div>
+  </section>
+</main>
+
+<footer>
+  <span class="mono">© 2026 Tampa De Masair · Tampa, FL</span>
+  <a href="#top" class="mono">Back to top ↑</a>
+</footer>
+<div class="toast" id="toast"></div>
+
+<script>
+const HANDLE = "@tampademasair"; // change to your real handle
+const GOAL = 1000000;
+
+// Loader
+let n = 0; const ln = document.getElementById('loadNum');
+const li = setInterval(() => {
+  n += Math.ceil(Math.random()*9);
+  if (n >= 100) { n = 100; clearInterval(li); setTimeout(() => document.getElementById('loader').classList.add('done'), 250); }
+  ln.textContent = String(n).padStart(3,'0');
+}, 30);
+
+// Tampa clock
+function tick(){
+  document.getElementById('clock').textContent =
+    new Date().toLocaleTimeString('en-US',{timeZone:'America/New_York',hour:'2-digit',minute:'2-digit'});
+}
+tick(); setInterval(tick, 10000);
+
+// Toast
+function toast(msg){ const t=document.getElementById('toast'); t.textContent=msg; t.classList.add('show'); clearTimeout(t._h); t._h=setTimeout(()=>t.classList.remove('show'),2200); }
+
+// Confetti
+function confetti(count=80){
+  const colors=['#ff6a1a','#ffd36a','#f2efe9','#7bd3ff'];
+  for(let i=0;i<count;i++){
+    const c=document.createElement('div'); c.className='confetti';
+    c.style.left=Math.random()*100+'vw';
+    c.style.background=colors[i%colors.length];
+    c.style.animationDuration=(1.6+Math.random()*1.8)+'s';
+    c.style.animationDelay=Math.random()*.4+'s';
+    document.body.appendChild(c); setTimeout(()=>c.remove(),4000);
+  }
+}
+
+// Follower counter
+let followers = 0, shown = 0;
+try { followers = +localStorage.getItem('tdm_followers') || 0; } catch(e){}
+const fEl=document.getElementById('followers'), bar=document.getElementById('barFill'), pct=document.getElementById('pct'), log=document.getElementById('log');
+const milestones=[1000,10000,100000,500000,1000000]; 
+function render(){
+  shown += (followers - shown) * 0.15;
+  if (Math.abs(followers - shown) < 1) shown = followers;
+  fEl.textContent = Math.round(shown).toLocaleString();
+  const p = Math.min(followers/GOAL,1);
+  bar.style.width = (p*100)+'%';
+  pct.textContent = (p*100).toFixed(3)+'%';
+  requestAnimationFrame(render);
+}
+render();
+document.querySelectorAll('[data-add]').forEach(b=>b.addEventListener('click',()=>{
+  const before=followers;
+  const add=Math.round(+b.dataset.add*(0.6+Math.random()*0.8));
+  followers=Math.min(GOAL,followers+add);
+  try{localStorage.setItem('tdm_followers',followers)}catch(e){}
+  log.textContent = `+${add.toLocaleString()} new followers. ${followers>=GOAL?'WE DID IT.':'Keep going.'}`;
+  milestones.forEach(m=>{ if(before<m && followers>=m){ confetti(m===GOAL?200:70); toast(`🎉 ${m.toLocaleString()} followers unlocked!`); }});
+}));
+document.getElementById('reset').onclick=()=>{followers=0;try{localStorage.setItem('tdm_followers',0)}catch(e){} log.textContent='Back to day one. Humble beginnings.';};
+
+// Scroll reveal
+const io=new IntersectionObserver(es=>es.forEach(e=>{if(e.isIntersecting){e.target.classList.add('in');io.unobserve(e.target);}}),{threshold:.15});
+document.querySelectorAll('.reveal').forEach(el=>io.observe(el));
+
+// Photo tilt (mouse + phone gyro)
+const photo=document.getElementById('photo');
+photo.addEventListener('mousemove',e=>{
+  const r=photo.getBoundingClientRect(), x=(e.clientX-r.left)/r.width-.5, y=(e.clientY-r.top)/r.height-.5;
+  photo.style.transform=`perspective(900px) rotateY(${x*10}deg) rotateX(${-y*10}deg)`;
+});
+photo.addEventListener('mouseleave',()=>photo.style.transform='');
+window.addEventListener('deviceorientation',e=>{
+  if(e.gamma==null)return;
+  photo.style.transform=`perspective(900px) rotateY(${Math.max(-10,Math.min(10,e.gamma/3))}deg) rotateX(${Math.max(-10,Math.min(10,(e.beta-45)/4))}deg)`;
+});
+
+// Quiz: the "No" button runs away
+const no=document.getElementById('no');
+function flee(){
+  const box=document.getElementById('quizBox').getBoundingClientRect();
+  no.style.left=(Math.random()*box.width*0.6 - box.width*0.3)+'px';
+  no.style.top=(Math.random()*80 - 40)+'px';
+  no.textContent=['No','Nope','Try again','Not an option','Wrong button'][Math.floor(Math.random()*5)];
+}
+no.addEventListener('mouseenter',flee);
+no.addEventListener('touchstart',e=>{e.preventDefault();flee();},{passive:false});
+no.addEventListener('click',flee);
+document.getElementById('yes').onclick=()=>{confetti(120);toast('Correct. You have great taste.');};
+
+// Copy handle
+document.getElementById('copy').onclick=async()=>{
+  try{await navigator.clipboard.writeText(HANDLE);toast('Copied '+HANDLE);}catch(e){toast(HANDLE);}
+};
+
+// Background dots = future followers
+const cv=document.getElementById('dots'), cx=cv.getContext('2d'); let W,H,pts=[];
+function size(){ W=cv.width=innerWidth*devicePixelRatio; H=cv.height=innerHeight*devicePixelRatio;
+  pts=Array.from({length:Math.min(140,Math.floor(innerWidth/7))},()=>({x:Math.random()*W,y:Math.random()*H,vx:(Math.random()-.5)*.3,vy:(Math.random()-.5)*.3,o:Math.random()<.12}));}
+size(); addEventListener('resize',size);
+(function draw(){
+  cx.clearRect(0,0,W,H);
+  for(const p of pts){ p.x=(p.x+p.vx+W)%W; p.y=(p.y+p.vy+H)%H;
+    cx.fillStyle=p.o?'#ff6a1a':'#3a3d40'; cx.beginPath(); cx.arc(p.x,p.y,(p.o?2.4:1.6)*devicePixelRatio,0,7); cx.fill(); }
+  requestAnimationFrame(draw);
+})();
+</script>
+</body>
+</html>
